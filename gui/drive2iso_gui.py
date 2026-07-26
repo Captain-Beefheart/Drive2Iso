@@ -10,6 +10,7 @@ Pure Python standard library (tkinter). Run:
 """
 import os
 import re
+import sys
 import queue
 import shutil
 import threading
@@ -40,15 +41,20 @@ def strip_ansi(s: str) -> str:
 
 
 def find_binary() -> str:
-    """Locate drive2iso(.exe): next to this script's repo root, cwd, or PATH."""
+    """Locate drive2iso(.exe): next to the GUI (exe when frozen, else repo root),
+    then the cwd, then PATH."""
     exe = "drive2iso.exe" if os.name == "nt" else "drive2iso"
-    here = os.path.dirname(os.path.abspath(__file__))
-    for cand in (os.path.join(here, "..", exe), os.path.join(os.getcwd(), exe)):
-        cand = os.path.abspath(cand)
+    dirs = []
+    if getattr(sys, "frozen", False):
+        dirs.append(os.path.dirname(sys.executable))          # beside the bundled exe
+    else:
+        dirs.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+    dirs.append(os.getcwd())
+    for d in dirs:
+        cand = os.path.abspath(os.path.join(d, exe))
         if os.path.isfile(cand):
             return cand
-    found = shutil.which(exe) or shutil.which("drive2iso")
-    return found or ""
+    return shutil.which(exe) or shutil.which("drive2iso") or ""
 
 
 def is_admin():

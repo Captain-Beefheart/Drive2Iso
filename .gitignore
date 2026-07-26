@@ -6,3 +6,7 @@
 *.AppImage
 __pycache__/
 *.pyc
+# PyInstaller artifacts
+gui/build/
+gui/dist/
+*.spec
