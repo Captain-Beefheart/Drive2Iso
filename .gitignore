@@ -4,3 +4,5 @@
 /out/
 *.iso
 *.AppImage
+__pycache__/
+*.pyc

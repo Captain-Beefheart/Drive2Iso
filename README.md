@@ -45,6 +45,7 @@ src/backend/
   winvss.c           VSS snapshot via Win32_ShadowCopy (works on client editions)
   winutil.c winusb.c firmware/elevation probes + raw PhysicalDrive IO (from ISO2Drive)
 src/main.c           thin CLI frontend
+gui/drive2iso_gui.py tkinter GUI that shells out to the CLI (no logic of its own)
 packaging/AppDir/    AppRun + .desktop + icon for appimagetool
 ```
 
@@ -95,6 +96,26 @@ and UEFI** from the same file. Because it is isohybrid it boots equally when:
 A live ISO written to a disk boots as a **live** (read-only squashfs + tmpfs
 overlay) system — not a persistent install. Persistence and an in-ISO installer
 are on the roadmap.
+
+## GUI
+
+A single-window, Etcher-styled **tkinter** front-end (`gui/drive2iso_gui.py`) that
+shells out to the `drive2iso` binary — it holds no logic of its own, so the CLI
+stays the single source of truth. Pick a source device (or **List partitions** /
+**Probe** it), set the output ISO and options, **Dry-run** to preview the exact
+plan, then **Build ISO ▶** (which adds `--commit` behind a confirmation). A
+**Write to USB…** dialog wraps the raw flasher. Command output streams live into
+the log, with ANSI stripped.
+
+Pure standard library — no pip installs. Run it with any Tk-capable Python 3:
+
+```bash
+python gui/drive2iso_gui.py          # pythonw on Windows to skip the console
+```
+
+The GUI auto-detects `drive2iso`/`drive2iso.exe` next to the repo root or on
+`PATH` (editable at the top of the window). On Windows, launch it from an
+**elevated** prompt so capture (VSS) and `write-usb` can run.
 
 ## Windows specifics
 
