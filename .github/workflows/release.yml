@@ -1,15 +1,16 @@
-name: release-appimage
+name: release-artifacts
 
-# Build the Linux binary + AppImage on Ubuntu and attach the AppImage to the
-# release. Also runs on demand. Building here doubles as a Linux compile check
-# for backend_linux.c (which cannot be built with the Windows MinGW toolchain).
+# On a published release (or on demand) build the release binaries and attach them:
+#   - Ubuntu  : drive2iso + Drive2Iso-x86_64.AppImage   (Linux compile check)
+#   - Windows : drive2iso.exe + Drive2Iso-GUI.exe        (Windows compile check)
+# Each OS job doubles as a compile check for that platform's backend.
 on:
   release:
     types: [published]
   workflow_dispatch:
     inputs:
       tag:
-        description: "Existing release tag to attach the AppImage to"
+        description: "Existing release tag to attach the artifacts to"
         required: true
 
 permissions:
@@ -39,3 +40,44 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.event.release.tag_name || github.event.inputs.tag }}
         run: gh release upload "$TAG" Drive2Iso-x86_64.AppImage --clobber
+
+  windows-exe:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up MSYS2 (same toolchain as local builds)
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          install: >-
+            make
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-python
+            mingw-w64-x86_64-tk
+            mingw-w64-x86_64-python-pyinstaller
+
+      - name: Build CLI (drive2iso.exe) — Windows compile check
+        run: make
+
+      - name: Bundle GUI (Drive2Iso-GUI.exe)
+        run: |
+          python -m PyInstaller --onefile --windowed --name Drive2Iso-GUI \
+            --distpath gui/dist --workpath gui/build --specpath gui --noconfirm \
+            gui/drive2iso_gui.py
+
+      - name: Sanity-check artifacts
+        run: |
+          file drive2iso.exe gui/dist/Drive2Iso-GUI.exe
+          ls -lh drive2iso.exe gui/dist/Drive2Iso-GUI.exe
+
+      # gh isn't on the minimal MSYS2 PATH; use the runner's pre-installed CLI.
+      - name: Upload exes to the release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name || github.event.inputs.tag }}
+        run: gh release upload "$env:TAG" drive2iso.exe gui/dist/Drive2Iso-GUI.exe --clobber
