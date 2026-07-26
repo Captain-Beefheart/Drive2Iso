@@ -58,7 +58,7 @@ jobs:
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-python
             mingw-w64-x86_64-tk
-            mingw-w64-x86_64-python-pyinstaller
+            mingw-w64-x86_64-pyinstaller
 
       - name: Build CLI (drive2iso.exe) — Windows compile check
         run: make
