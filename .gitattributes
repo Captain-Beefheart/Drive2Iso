@@ -1,0 +1,4 @@
+# Store and check out text as LF everywhere — the shell scripts (AppRun,
+# build-appimage.sh) and Makefile must stay LF to run on Linux; MSYS2/MinGW on
+# Windows handles LF fine too.
+* text=auto eol=lf

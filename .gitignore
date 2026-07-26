@@ -1,0 +1,6 @@
+*.o
+/drive2iso
+/drive2iso.exe
+/out/
+*.iso
+*.AppImage

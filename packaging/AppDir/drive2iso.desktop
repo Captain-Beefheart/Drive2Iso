@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Drive2Iso
+Comment=Capture a partition into a bootable ISO
+Exec=drive2iso
+Icon=drive2iso
+Categories=System;Utility;
+Terminal=true
