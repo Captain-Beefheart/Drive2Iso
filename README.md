@@ -121,6 +121,8 @@ are on the roadmap.
 
 ## GUI
 
+![The Drive2Iso GUI probing the C: drive](docs/gui.png)
+
 A single-window, Etcher-styled **tkinter** front-end (`gui/drive2iso_gui.py`) that
 shells out to the `drive2iso` binary — it holds no logic of its own, so the CLI
 stays the single source of truth. Pick a source device (or **List partitions** /
