@@ -1,0 +1,41 @@
+name: release-appimage
+
+# Build the Linux binary + AppImage on Ubuntu and attach the AppImage to the
+# release. Also runs on demand. Building here doubles as a Linux compile check
+# for backend_linux.c (which cannot be built with the Windows MinGW toolchain).
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing release tag to attach the AppImage to"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  appimage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential wget file desktop-file-utils
+
+      - name: Build binary + AppImage
+        run: sh packaging/build-appimage.sh
+
+      - name: Sanity-check artifacts
+        run: |
+          file drive2iso
+          ls -lh Drive2Iso-x86_64.AppImage
+
+      - name: Upload AppImage to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name || github.event.inputs.tag }}
+        run: gh release upload "$TAG" Drive2Iso-x86_64.AppImage --clobber
