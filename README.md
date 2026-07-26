@@ -11,6 +11,28 @@ project's shape — a portable `src/core`, per-host backends behind a vtable, an
 `$(OS)`-selected Makefile, dry-run-until-`--commit`, and the Etcher-style
 three-step flow, now **SOURCE → CAPTURE → IMAGE**.
 
+## Download
+
+Prebuilt binaries are attached to every
+[release](https://github.com/Captain-Beefheart/Drive2Iso/releases) — grab the
+[latest](https://github.com/Captain-Beefheart/Drive2Iso/releases/latest). They are
+built automatically by CI (Ubuntu + Windows runners), so no toolchain is needed:
+
+| File | Platform | What it is |
+|------|----------|------------|
+| `Drive2Iso-GUI.exe` | Windows | the graphical app — self-contained, ~12 MB |
+| `drive2iso.exe` | Windows | the CLI engine the GUI drives |
+| `Drive2Iso-x86_64.AppImage` | Linux | the CLI as a portable AppImage |
+
+- **Windows:** put `Drive2Iso-GUI.exe` and `drive2iso.exe` in the **same folder**
+  (the GUI auto-detects the CLI beside it) and launch from an **elevated** prompt,
+  so capture (VSS) and `write-usb` can run.
+- **Linux:** `chmod +x Drive2Iso-x86_64.AppImage && ./Drive2Iso-x86_64.AppImage`.
+  A real capture still needs `mksquashfs`/`xorriso` on the host (`doctor` reports
+  what's missing).
+
+Prefer to build it yourself? See [Build](#build) below.
+
 ## What "live isohybrid ISO" means per OS (read this first)
 
 The phrase is honest on Linux and aspirational on Windows, so the tool treats
